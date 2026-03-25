@@ -1,3 +1,14 @@
+class Book:
+    def __init__(self, book_id, title, author, year, available=True):
+        self.book_id = book_id
+        self.title = title
+        self.author = author
+        self.year = year
+        self.available = available
+
+    def __str__(self):
+        status = "Available" if self.available else "Borrowed"
+        return f"[{self.book_id}] {self.title} by {self.author} ({self.year}) - {status}"
 class BookManager:
     def __init__(self, db):
         self.db = db
@@ -19,7 +30,11 @@ class BookManager:
         cursor.execute("SELECT * FROM books")
         results = cursor.fetchall()
         conn.close()
-        return results
+
+        # Convert dictionaries into Book objects
+        books = [Book(r["book_id"], r["title"], r["author"], r["year"], r["available"]) for r in results]
+        return books
+
 
     def search_books(self, keywords):
         conn = self.db.connect()
@@ -58,5 +73,4 @@ class BookManager:
         conn.commit()
         conn.close()
         print("Book deleted successfully!")
-    def __str__(self):#title, author, year
-        return f"{self.title}: {self.author}\t"
+

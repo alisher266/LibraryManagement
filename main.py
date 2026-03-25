@@ -40,7 +40,8 @@ def menu():
             year = input("Enter year: ")
             books.add_book(title, author, year)
         elif choice == "2":
-            for b in books.view_books():
+            books_list = books.view_books()
+            for b in books_list:
                 print(b)
         elif choice == "3":
             keyword = input("Enter keyword: ")
@@ -51,8 +52,10 @@ def menu():
             email = input("Enter email: ")
             users.add_user(name, email)
         elif choice == "5":
-            for u in users.view_users():
+            users_list = users.view_users()
+            for u in users_list:
                 print(u)
+
         elif choice == "6":
             user_id = input("Enter user ID: ")
             book_id = input("Enter book ID: ")

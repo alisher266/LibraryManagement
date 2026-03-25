@@ -1,3 +1,11 @@
+class User:
+    def __init__(self, user_id, name, email):
+        self.user_id = user_id
+        self.name = name
+        self.email = email
+
+    def __str__(self):
+        return f"[{self.user_id}] {self.name} <{self.email}>"
 class UserManager:
     def __init__(self, db):
         self.db = db
@@ -18,7 +26,10 @@ class UserManager:
         cursor.execute("SELECT * FROM users")
         results = cursor.fetchall()
         conn.close()
-        return results
+
+        # Convert dictionaries into User objects
+        users = [User(r["user_id"], r["name"], r["email"]) for r in results]
+        return users
 
     def update_user(self, user_id, name, email):
         conn = self.db.connect()
