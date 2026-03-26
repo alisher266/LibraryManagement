@@ -59,10 +59,9 @@ def menu():
             email = input("Enter user email: ")
             book_title = input("Enter book title: ")
             borrowing.borrow_book(email, book_title)
-
         elif choice == "7":
-            borrow_id = input("Enter borrow ID: ")
-            borrowing.return_book(borrow_id)
+            email = input("Enter user email: ")
+            borrowing.return_book(email)
         elif choice == "8":
             book_id = validate_int(input("Book ID: "), "Book ID")
             title = input("New title: ")

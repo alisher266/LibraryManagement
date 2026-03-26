@@ -37,24 +37,61 @@ class BorrowingManager:
         conn.commit()
         conn.close()
         print(f"{email} borrowed '{book_title}' successfully!")
-
-    def return_book(self, borrow_id):
+    def return_book(self, email):
         conn = self.db.connect()
         if not conn: return
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT book_id FROM borrowing WHERE borrow_id=%s AND return_date IS NULL", (borrow_id,))
-        record = cursor.fetchone()
-        if not record:
-            print("Invalid borrow ID or already returned.")
+        # Step 1: Find user by email
+        cursor.execute("SELECT user_id, name FROM users WHERE email=%s", (email,))
+        user = cursor.fetchone()
+        if not user:
+            print(f"❌ No user found with email {email}")
             conn.close()
             return
 
+        # Step 2: Find all active borrowings for this user
+        cursor.execute("""
+            SELECT b.borrow_id, bk.title
+            FROM borrowing b
+            JOIN books bk ON b.book_id = bk.book_id
+            WHERE b.user_id=%s AND b.return_date IS NULL
+        """, (user["user_id"],))
+        records = cursor.fetchall()
+
+        if not records:
+            print(f"❌ {user['name']} ({email}) has no active borrowings.")
+            conn.close()
+            return
+
+        # Step 3: Show borrowed books
+        print(f"Books currently borrowed by {user['name']} ({email}):")
+        for i, r in enumerate(records, start=1):
+            print(f"{i}. {r['title']}")
+
+        # Step 4: Ask which one to return
+        choice = input("Enter the number of the book to return: ")
+        try:
+            choice = int(choice)
+            if choice < 1 or choice > len(records):
+                print("❌ Invalid choice.")
+                conn.close()
+                return
+        except ValueError:
+            print("❌ Please enter a valid number.")
+            conn.close()
+            return
+
+        borrow_id = records[choice - 1]["borrow_id"]
+        book_title = records[choice - 1]["title"]
+
+        # Step 5: Mark as returned
         cursor.execute("UPDATE borrowing SET return_date=CURDATE() WHERE borrow_id=%s", (borrow_id,))
-        cursor.execute("UPDATE books SET available=1 WHERE book_id=%s", (record["book_id"],))
+        cursor.execute("UPDATE books SET available=1 WHERE book_id=(SELECT book_id FROM borrowing WHERE borrow_id=%s)", (borrow_id,))
         conn.commit()
         conn.close()
-        print("Book returned successfully!")
+        print(f"✅ {user['name']} ({email}) returned '{book_title}' successfully!")
+
     def view_borrowings(self):
         conn = self.db.connect()
         if not conn: return []
