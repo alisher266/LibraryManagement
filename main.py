@@ -12,7 +12,6 @@ def get_db_info():
 def menu():
     db = get_db_info()
     db.initialize()   
-
     books = BookManager(db)
     users = UserManager(db)
     borrowing = BorrowingManager(db)
@@ -30,7 +29,8 @@ def menu():
         print("9. Delete Book")
         print("10. Update User")
         print("11. Delete User")
-        print("12. Exit")
+        print("12. Borrowing records")
+        print("13. Exit")
 
         choice = input("Enter choice: ")
 
@@ -55,11 +55,11 @@ def menu():
             users_list = users.view_users()
             for u in users_list:
                 print(u)
-
         elif choice == "6":
-            user_id = input("Enter user ID: ")
-            book_id = input("Enter book ID: ")
-            borrowing.borrow_book(user_id, book_id)
+            email = input("Enter user email: ")
+            book_title = input("Enter book title: ")
+            borrowing.borrow_book(email, book_title)
+
         elif choice == "7":
             borrow_id = input("Enter borrow ID: ")
             borrowing.return_book(borrow_id)
@@ -87,6 +87,13 @@ def menu():
             if user_id:
                 users.delete_user(user_id)
         elif choice == "12":
+            borrowings_list = borrowing.view_borrowings()
+            if not borrowings_list:
+                print("No borrowings found.")
+            else:
+                for br in borrowings_list:
+                    print(br)
+        elif choice == "13":
             print("Goodbye!")
             break
         else:
