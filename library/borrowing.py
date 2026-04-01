@@ -2,7 +2,7 @@ class BorrowingManager:
     def __init__(self, db):
         self.db = db
 
-    def borrow_book(self, email, book_title):
+    def borrow_book(self, email, book_id):
         conn = self.db.connect()
         if not conn: return
         cursor = conn.cursor(dictionary=True)
@@ -11,32 +11,32 @@ class BorrowingManager:
         cursor.execute("SELECT user_id FROM users WHERE email=%s", (email,))
         user = cursor.fetchone()
         if not user:
-            print(f"No user found with email {email}")
+            print(f"❌ No user found with email {email}")
             conn.close()
             return
 
-        # Find book by title
-        cursor.execute("SELECT book_id, available FROM books WHERE title=%s", (book_title,))
+        # Find book by ID
+        cursor.execute("SELECT title, available FROM books WHERE book_id=%s", (book_id,))
         book = cursor.fetchone()
         if not book:
-            print(f"No book found with title '{book_title}'")
+            print(f"❌ No book found with ID {book_id}")
             conn.close()
             return
 
         if book["available"] == 0:
-            print(f"Book '{book_title}' is already borrowed.")
+            print(f"❌ Book '{book['title']}' is already borrowed.")
             conn.close()
             return
 
         # Borrow the book
         cursor.execute(
             "INSERT INTO borrowing (user_id, book_id, borrow_date) VALUES (%s, %s, CURDATE())",
-            (user["user_id"], book["book_id"])
+            (user["user_id"], book_id)
         )
-        cursor.execute("UPDATE books SET available=0 WHERE book_id=%s", (book["book_id"],))
+        cursor.execute("UPDATE books SET available=0 WHERE book_id=%s", (book_id,))
         conn.commit()
         conn.close()
-        print(f"{email} borrowed '{book_title}' successfully!")
+        print(f"✅ {email} borrowed '{book['title']}' successfully!")
     def return_book(self, email):
         conn = self.db.connect()
         if not conn: return

@@ -40,6 +40,9 @@ def menu():
             year = input("Enter year: ")
             books.add_book(title, author, year)
         elif choice == "2":
+            print("="*60)
+            print(" LIBRARY BOOKS ".center(60))
+            print("="*60)
             books_list = books.view_books()
             for b in books_list:
                 print(b)
@@ -56,9 +59,17 @@ def menu():
             for u in users_list:
                 print(u)
         elif choice == "6":
+            print("="*60)
+            print(" LIBRARY BOOKS ".center(60))
+            print("="*60)
+            books_list = books.view_books()
+            for b in books_list:
+                print(b)
+            print("="*60) 
             email = input("Enter user email: ")
-            book_title = input("Enter book title: ")
-            borrowing.borrow_book(email, book_title)
+            book_id = input("Enter book ID: ")
+            borrowing.borrow_book(email, book_id)
+
         elif choice == "7":
             email = input("Enter user email: ")
             borrowing.return_book(email)
@@ -100,3 +111,4 @@ def menu():
 
 if __name__ == "__main__":
     menu()
+
