@@ -64,12 +64,12 @@ class BorrowingManager:
             conn.close()
             return
 
-        # Step 3: Show borrowed books
+        # Step 3: Show borrowed books with sequential numbers
         print(f"Books currently borrowed by {user['name']} ({email}):")
         for i, r in enumerate(records, start=1):
             print(f"{i}. {r['title']}")
 
-        # Step 4: Ask which one to return
+        # Step 4: Ask which one to return (sequential number)
         choice = input("Enter the number of the book to return: ")
         try:
             choice = int(choice)
@@ -82,6 +82,7 @@ class BorrowingManager:
             conn.close()
             return
 
+        # Map sequential number back to borrow_id
         borrow_id = records[choice - 1]["borrow_id"]
         book_title = records[choice - 1]["title"]
 
@@ -91,6 +92,8 @@ class BorrowingManager:
         conn.commit()
         conn.close()
         print(f"✅ {user['name']} ({email}) returned '{book_title}' successfully!")
+
+
 
     def view_borrowings(self):
         conn = self.db.connect()
